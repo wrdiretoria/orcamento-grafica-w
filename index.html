@@ -340,6 +340,22 @@ footer{text-align:center;padding:1.5rem;font-size:12px;color:#bbb;border-top:1px
 </div>
 <p style="font-size:11px;color:#999;margin-top:10px">Cartão de visita 9x5cm, arte pronta. Preço com frete incluso.</p>
 </div>
+<div class="print-flow" id="adesivoGFFlow">
+<div class="field" style="margin-bottom:1rem">
+<label>Tipo</label>
+<select id="agfTipo" onchange="agfUpdate()" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:14px"></select>
+</div>
+<div style="display:flex;gap:10px">
+<div class="field" style="flex:1"><label>Largura (cm)</label><input type="number" id="agfLarg" value="100" min="1" oninput="agfUpdate()" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:14px"></div>
+<div class="field" style="flex:1"><label>Altura (cm)</label><input type="number" id="agfAlt" value="100" min="1" oninput="agfUpdate()" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:14px"></div>
+</div>
+<div class="result-card" id="agfResult" style="margin-top:1rem">
+<div class="result-row"><span class="label">Prazo de produção</span><span class="value" id="agfPrazo">24h</span></div>
+<div class="result-row total"><span class="label">Total estimado</span><span class="value" id="agfTotal">R$ 0,00</span></div>
+<a class="whatsapp-btn" id="agfWpp" href="#" target="_blank" onclick="gtag('event','whatsapp_click',{'event_category':'conversao','event_label':'adesivo_gf'})"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Pedir via WhatsApp</a>
+</div>
+<p style="font-size:11px;color:#999;margin-top:10px">Arte pronta. Preço com frete incluso.</p>
+</div>
 <div class="product-grid" id="productGrid"></div>
 <div class="configurator hidden" id="configurator">
 <h3 id="configTitle"></h3>
@@ -448,7 +464,22 @@ function cvUpdateAcab(){const p=$('cvPapel').value,c=$('cvCor').value;cvFill($('
 function cvUpdateQtd(){const p=$('cvPapel').value,c=$('cvCor').value,a=$('cvAcab').value;cvFill($('cvQtd'),cvUnique(CV_DADOS.filter(d=>d.papel===p&&d.cor===c&&d.acabamento===a).map(d=>d.qtd)));cvUpdatePreco();}
 function cvUpdatePreco(){const p=$('cvPapel').value,c=$('cvCor').value,a=$('cvAcab').value,q=$('cvQtd').value;const item=CV_DADOS.find(d=>d.papel===p&&d.cor===c&&d.acabamento===a&&d.qtd===q);if(!item)return;const total=item.custo*(1+MARGEM_CV)+FRETE;$('cvPrazo').textContent=item.prazo;$('cvTotal').textContent=fmt(total);$('cvResult').style.display='block';const msg='Olá! Quero orçamento: Cartão de visita '+p+', '+c+', '+a+', '+q+' — valor '+fmt(total);$('cvWpp').href='https://wa.me/'+PHONE+'?text='+encodeURIComponent(msg);}
 function cvInit(){cvFill($('cvPapel'),cvUnique(CV_DADOS.map(d=>d.papel)));cvUpdateCor();}
-function selectCat(id){activeCat=id;sel=null;fv={};renderCats();renderGrid();$('configurator').classList.add('hidden');$('resultCard').classList.add('hidden');const allFlows=['printFlow','especiaisFlow','panfletoFlow','credenciaisFlow','windBannerFlow','cartaoVisitaFlow','bannerLonaFlow'];allFlows.forEach(f=>{const el=$(f);if(el)el.classList.remove('active');});if(id==='impressao'){$('printFlow').classList.add('active');$('productGrid').classList.add('hidden');pfReset();}else if(id==='especiais'){$('especiaisFlow').classList.add('active');$('productGrid').classList.add('hidden');epReset();}else if(id==='panfleto'){$('panfletoFlow').classList.add('active');$('productGrid').classList.add('hidden');pfGramSel('90g');}else if(id==='credenciais'){$('credenciaisFlow').classList.add('active');$('productGrid').classList.add('hidden');credEscadaRender();}else if(id==='windbanner'){$('windBannerFlow').classList.add('active');$('productGrid').classList.add('hidden');wbCalc();}else if(id==='cartaovisita'){$('cartaoVisitaFlow').classList.add('active');$('productGrid').classList.add('hidden');cvInit();}else if(id==='banner'){$('bannerLonaFlow').classList.add('active');$('productGrid').classList.add('hidden');blUpdate();}else{$('productGrid').classList.remove('hidden');}}
+const AGF_TIPOS=[
+{nome:"Brilho",taxa:25.0,minimo:15.0,prazo:"24h",corte:false},
+{nome:"Brilho + Corte Contorno",taxa:25.0,minimo:15.0,prazo:"24h",corte:true},
+{nome:"Fosco",taxa:25.0,minimo:15.0,prazo:"24h",corte:false},
+{nome:"Fosco + Corte Contorno",taxa:25.0,minimo:15.0,prazo:"24h",corte:true},
+{nome:"Blackout Brilho",taxa:35.0,minimo:35.0,prazo:"24h",corte:false},
+{nome:"Blackout Brilho + Corte Contorno",taxa:35.0,minimo:35.0,prazo:"48h",corte:true},
+{nome:"Blackout Fosco",taxa:35.0,minimo:35.0,prazo:"24h",corte:false},
+{nome:"Blackout Fosco + Corte Contorno",taxa:35.0,minimo:35.0,prazo:"48h",corte:true},
+{nome:"Microperfurado",taxa:35.0,minimo:35.0,prazo:"24h",corte:false},
+{nome:"Transparente",taxa:25.0,minimo:17.5,prazo:"24h",corte:false},
+{nome:"Transparente + Corte Contorno",taxa:25.0,minimo:17.5,prazo:"48h",corte:true}
+];
+function agfInit(){const sel=$('agfTipo');sel.innerHTML='';AGF_TIPOS.forEach((t,i)=>{const o=document.createElement('option');o.value=i;o.textContent=t.nome;sel.appendChild(o);});agfUpdate();}
+function agfUpdate(){const t=AGF_TIPOS[parseInt($('agfTipo').value)||0];const larg=parseFloat($('agfLarg').value)||0;const alt=parseFloat($('agfAlt').value)||0;const area=(larg/100)*(alt/100);const custo=Math.max(area*t.taxa,t.minimo);const total=(custo*2.10)+FRETE+(t.corte?10:0);$('agfPrazo').textContent=t.prazo;$('agfTotal').textContent=fmtR(total);const msg='Olá! Quero orçamento: Adesivo '+t.nome+', '+larg+'x'+alt+'cm — valor '+fmtR(total);$('agfWpp').href='https://wa.me/'+PHONE+'?text='+encodeURIComponent(msg);}
+function selectCat(id){activeCat=id;sel=null;fv={};renderCats();renderGrid();$('configurator').classList.add('hidden');$('resultCard').classList.add('hidden');const allFlows=['printFlow','especiaisFlow','panfletoFlow','credenciaisFlow','windBannerFlow','cartaoVisitaFlow','bannerLonaFlow','adesivoGFFlow'];allFlows.forEach(f=>{const el=$(f);if(el)el.classList.remove('active');});if(id==='impressao'){$('printFlow').classList.add('active');$('productGrid').classList.add('hidden');pfReset();}else if(id==='especiais'){$('especiaisFlow').classList.add('active');$('productGrid').classList.add('hidden');epReset();}else if(id==='panfleto'){$('panfletoFlow').classList.add('active');$('productGrid').classList.add('hidden');pfGramSel('90g');}else if(id==='credenciais'){$('credenciaisFlow').classList.add('active');$('productGrid').classList.add('hidden');credEscadaRender();}else if(id==='windbanner'){$('windBannerFlow').classList.add('active');$('productGrid').classList.add('hidden');wbCalc();}else if(id==='cartaovisita'){$('cartaoVisitaFlow').classList.add('active');$('productGrid').classList.add('hidden');cvInit();}else if(id==='banner'){$('bannerLonaFlow').classList.add('active');$('productGrid').classList.add('hidden');blUpdate();}else if(id==='grandeformato'){$('adesivoGFFlow').classList.add('active');$('productGrid').classList.add('hidden');agfInit();}else{$('productGrid').classList.remove('hidden');}}
 function renderCats(){const c=$('cats');if(!c)return;c.innerHTML='';cats.forEach(c2=>{const b=document.createElement('button');b.className='cat-btn'+(c2.id===activeCat?' active':'');b.textContent=c2.label;b.onclick=()=>selectCat(c2.id);c.appendChild(b);});}
 function renderGrid(){$('productGrid').innerHTML='';products.filter(p=>p.cat===activeCat).forEach(p=>{const c=document.createElement('div');c.className='product-card'+(sel&&sel.id===p.id?' selected':'');c.innerHTML='<h3>'+p.name+'</h3><p>'+p.desc+'</p>';c.onclick=()=>{sel=p;fv={};p.fields.forEach(f=>{fv[f.id]=f.value!==undefined?f.value:(f.options?f.options[0]:'');});renderGrid();renderConfig();};$('productGrid').appendChild(c);});}
 function goToCat(id){selectCat(id);$('homeScreen').classList.add('hidden');$('catView').classList.remove('hidden');window.scrollTo(0,0);}
