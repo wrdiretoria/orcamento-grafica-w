@@ -261,11 +261,8 @@ footer{text-align:center;padding:1.5rem;font-size:12px;color:#bbb;border-top:1px
 </div>
 <div class="field" style="margin-bottom:1rem">
 <label>Quantidade</label>
-<select id="blMiniQtd" onchange="blUpdate()">
-<option value="1">1 unidade</option>
-<option value="8">8 unidades</option>
-<option value="16">16 unidades</option>
-</select>
+<input type="number" id="blMiniQtd" value="1" min="1" oninput="blUpdate()" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:14px">
+<p style="font-size:12px;color:#999;margin:4px 0 0">1–7 un: R$9,90/un • 8–15 un: R$8,90/un • 16+: R$7,90/un</p>
 </div>
 </div>
 <div id="blBlocoLona" style="display:none">
@@ -443,7 +440,7 @@ function epCalc(){if(!epState.papel||!epState.tamanho)return;const info=EP_PRECO
 const BL_MINI={"33x70cm":{"1":9.9,"8":8.9,"16":7.9},"40x60cm":{"1":9.9,"8":8.9,"16":7.9}};
 const MARGEM_BL=1.10;
 function blToggle(){const isMini=$('blProduto').value==='mini';$('blBlocoMini').style.display=isMini?'block':'none';$('blBlocoLona').style.display=isMini?'none':'block';blUpdate();}
-function blUpdate(){let custo,prazo,msg;if($('blProduto').value==='mini'){const tam=$('blMiniTam').value,qtd=$('blMiniQtd').value;custo=BL_MINI[tam][qtd]*parseInt(qtd);prazo='24h';msg='Olá! Quero orçamento: Mini Banner '+tam+', '+qtd+' unidade(s).';}else{const acab=$('blLonaAcab').value,larg=parseFloat($('blLonaLarg').value)||0,alt=parseFloat($('blLonaAlt').value)||0;const area=(larg/100)*(alt/100);custo=Math.max(area*30,15);prazo='24h';msg='Olá! Quero orçamento: Lona 300g '+acab+', '+larg+'x'+alt+'cm.';}const total=custo*(1+MARGEM_BL)+FRETE;$('blTotal').textContent=fmt(total);$('blPrazo').textContent=prazo;$('blWpp').href='https://wa.me/'+PHONE+'?text='+encodeURIComponent(msg+' Valor: '+fmt(total));}
+function blUpdate(){let custo,prazo,msg;if($('blProduto').value==='mini'){const tam=$('blMiniTam').value,qtd=parseInt($('blMiniQtd').value)||1;const unit=qtd>=16?7.9:qtd>=8?8.9:9.9;custo=unit*qtd;prazo='24h';msg='Olá! Quero orçamento: Mini Banner '+tam+', '+qtd+' unidade(s).';}else{const acab=$('blLonaAcab').value,larg=parseFloat($('blLonaLarg').value)||0,alt=parseFloat($('blLonaAlt').value)||0;const area=(larg/100)*(alt/100);custo=Math.max(area*30,15);prazo='24h';msg='Olá! Quero orçamento: Lona 300g '+acab+', '+larg+'x'+alt+'cm.';}const total=custo*(1+MARGEM_BL)+FRETE;$('blTotal').textContent=fmt(total);$('blPrazo').textContent=prazo;$('blWpp').href='https://wa.me/'+PHONE+'?text='+encodeURIComponent(msg+' Valor: '+fmt(total));}
 const CV_DADOS=[{papel:"250g",cor:"4/0",acabamento:"UV 1/0",qtd:"100un",custo:14.0,prazo:"24h"},{papel:"250g",cor:"4/0",acabamento:"UV 1/0",qtd:"250un",custo:24.0,prazo:"24h"},{papel:"250g",cor:"4/0",acabamento:"UV 1/0",qtd:"500un",custo:27.5,prazo:"24h"},{papel:"250g",cor:"4/0",acabamento:"UV 1/0",qtd:"1.000un",custo:29.5,prazo:"24h"},{papel:"250g",cor:"4/0",acabamento:"UV 1/0",qtd:"2.000un",custo:59.0,prazo:"24h"},{papel:"250g",cor:"4/0",acabamento:"UV 1/0",qtd:"3.000un",custo:88.5,prazo:"24h"},{papel:"250g",cor:"4/0",acabamento:"UV 1/0",qtd:"5.000un",custo:145.0,prazo:"24h"},{papel:"250g",cor:"4/1",acabamento:"UV 1/0",qtd:"100un",custo:22.0,prazo:"24h"},{papel:"250g",cor:"4/1",acabamento:"UV 1/0",qtd:"250un",custo:27.5,prazo:"24h"},{papel:"250g",cor:"4/1",acabamento:"UV 1/0",qtd:"500un",custo:30.0,prazo:"24h"},{papel:"250g",cor:"4/1",acabamento:"UV 1/0",qtd:"1.000un",custo:34.5,prazo:"24h"},{papel:"250g",cor:"4/1",acabamento:"UV 1/0",qtd:"2.000un",custo:69.0,prazo:"24h"},{papel:"250g",cor:"4/1",acabamento:"UV 1/0",qtd:"3.000un",custo:103.5,prazo:"24h"},{papel:"250g",cor:"4/1",acabamento:"UV 1/0",qtd:"5.000un",custo:172.5,prazo:"24h"},{papel:"250g",cor:"4/4",acabamento:"UV 1/0",qtd:"100un",custo:22.0,prazo:"24h"},{papel:"250g",cor:"4/4",acabamento:"UV 1/0",qtd:"250un",custo:27.5,prazo:"24h"},{papel:"250g",cor:"4/4",acabamento:"UV 1/0",qtd:"500un",custo:30.0,prazo:"24h"},{papel:"250g",cor:"4/4",acabamento:"UV 1/0",qtd:"1.000un",custo:34.5,prazo:"24h"},{papel:"250g",cor:"4/4",acabamento:"UV 1/0",qtd:"2.000un",custo:69.0,prazo:"24h"},{papel:"250g",cor:"4/4",acabamento:"UV 1/0",qtd:"3.000un",custo:103.5,prazo:"24h"},{papel:"250g",cor:"4/4",acabamento:"UV 1/0",qtd:"5.000un",custo:172.5,prazo:"24h"}];
 const MARGEM_CV=1.10;
 function cvUnique(arr){return[...new Set(arr)];}
