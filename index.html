@@ -108,40 +108,32 @@ footer{text-align:center;padding:1.5rem;font-size:12px;color:#bbb;border-top:1px
 <button class="back-to-home" onclick="goHome()">← Voltar para o início</button>
 <div class="print-flow" id="printFlow">
 <div class="pf-screen active" id="pf1">
-<div class="pf-topbar"><button class="pf-back pf-hidden">←</button><h3>Impressão Papel Comum — escolha o tamanho</h3></div>
+<div class="pf-topbar"><button class="pf-back pf-hidden">←</button><h3>Impressão Papel Comum</h3></div>
 <p class="pf-subtitle">Selecione o formato do papel</p>
-<div class="pf-grid">
-<div class="pf-card" onclick="pfSelectTamanho('A4')"><div class="pf-icon">📄</div><h4>A4</h4><p>21 x 29,7 cm</p></div>
-<div class="pf-card" onclick="pfSelectTamanho('A3')"><div class="pf-icon">📃</div><h4>A3</h4><p>30 x 42 cm</p></div>
-<div class="pf-card" onclick="pfSelectTamanho('A2')"><div class="pf-icon">🗒️</div><h4>A2</h4><p>42 x 59,4 cm</p></div>
-<div class="pf-card" onclick="pfSelectTamanho('A1')"><div class="pf-icon">📋</div><h4>A1</h4><p>59,4 x 84,1 cm</p></div>
+<div class="pf-grid" id="pfTamGrid">
+<div class="pf-card" id="pfCardA4" onclick="pfSelectTamanho('A4')"><div class="pf-icon">📄</div><h4>A4</h4><p>21 x 29,7 cm</p></div>
+<div class="pf-card" id="pfCardA3" onclick="pfSelectTamanho('A3')"><div class="pf-icon">📃</div><h4>A3</h4><p>30 x 42 cm</p></div>
+<div class="pf-card" id="pfCardA2" onclick="pfSelectTamanho('A2')"><div class="pf-icon">🗒️</div><h4>A2</h4><p>42 x 59,4 cm</p></div>
+<div class="pf-card" id="pfCardA1" onclick="pfSelectTamanho('A1')"><div class="pf-icon">📋</div><h4>A1</h4><p>59,4 x 84,1 cm</p></div>
 </div>
-</div>
-<div class="pf-screen" id="pf2">
-<div class="pf-topbar"><button class="pf-back" onclick="pfGoTo(1)">←</button><h3>Impressão Papel Comum — escolha a cor</h3></div>
-<p class="pf-subtitle">Tamanho selecionado: <strong id="pfTamanhoSel"></strong></p>
-<div class="pf-grid">
-<div class="pf-card" onclick="pfSelectCor('pb')"><div class="pf-icon">⚫</div><h4>Preto e Branco</h4><p>Documentos, texto</p></div>
-<div class="pf-card" onclick="pfSelectCor('cor')"><div class="pf-icon">🎨</div><h4>Colorido</h4><p>Imagens, gráficos</p></div>
-</div>
-</div>
-<div class="pf-screen" id="pf3">
-<div class="pf-topbar"><button class="pf-back" onclick="pfGoTo(2)">←</button><h3>Detalhes do pedido</h3></div>
-<p class="pf-subtitle"><span id="pfResumoSel"></span></p>
-<div class="pf-grid tres" id="pfTipoOptions"></div>
-<div id="pfConfigArea" style="display:none;margin-top:1.25rem">
+<div id="pfInlineConfig" style="display:none;margin-top:1.5rem">
+<div class="field"><label>Cor</label>
+<div class="btn-group">
+<button class="btn-opt" id="pfBtnPB" onclick="pfSetCor('pb')">Preto e Branco</button>
+<button class="btn-opt" id="pfBtnCor" onclick="pfSetCor('cor')">Colorido</button>
+</div></div>
+<div class="field" id="pfTipoField"><label>Tipo de conteúdo</label>
+<div class="btn-group" id="pfTipoGroup"></div></div>
 <div class="field">
 <label>Quantidade de folhas</label>
 <input type="number" id="pfQtyInput" min="1" value="10" oninput="pfCalc()">
 <div class="faixa-info" id="pfFaixaInfo" style="display:none"></div>
 </div>
-<div class="field" id="pfLadoField">
-<label>Impressão</label>
+<div class="field" id="pfLadoField"><label>Impressão</label>
 <select id="pfLadoSelect" onchange="pfCalc()">
 <option value="frente">Frente apenas</option>
 <option value="fv">Frente e verso (20% desconto)</option>
-</select>
-</div>
+</select></div>
 <div class="result-card">
 <div class="result-row"><span class="label">Preço unitário</span><span class="value" id="pfUnit">—</span></div>
 <div class="result-row desconto" id="pfDescRow" style="display:none"><span class="label">Desconto frente/verso</span><span class="value" id="pfDesc">—</span></div>
@@ -523,11 +515,11 @@ let activeCat="impressao",sel=null,fv={};
 let pfState={tamanho:null,cor:null,tipo:null};
 const fmt=v=>"R$ "+v.toFixed(2).replace(".",",");
 const $=id=>document.getElementById(id);
-function pfGoTo(n){document.querySelectorAll('.pf-screen').forEach(s=>s.classList.remove('active'));$('pf'+n).classList.add('active');}
-function pfReset(){pfState={tamanho:null,cor:null,tipo:null};pfGoTo(1);}
-function pfSelectTamanho(tam){pfState.tamanho=tam;$('pfTamanhoSel').textContent=tam;pfGoTo(2);}
-function pfSelectCor(cor){pfState.cor=cor;const resumo=pfState.tamanho+" \u2022 "+(cor==='pb'?'Preto e Branco':'Colorido');$('pfResumoSel').textContent=resumo;const tipoOptions=$('pfTipoOptions');tipoOptions.innerHTML='';const labelCor=cor==='pb'?'Preto e Branco':'Colorido';const optTexto=document.createElement('div');optTexto.className='pf-card';optTexto.innerHTML='<div class="pf-icon">\u{1F4DD}</div><h4>'+labelCor+' \u2014 Texto</h4><p>Documento, pouca tinta</p>';optTexto.onclick=()=>pfSelectTipo('texto');const optImagem=document.createElement('div');optImagem.className='pf-card';optImagem.innerHTML='<div class="pf-icon">\u{1F5BC}\uFE0F</div><h4>'+labelCor+' \u2014 Com imagem</h4><p>Fotos, gr\u00e1ficos, ilustra\u00e7\u00f5es</p>';optImagem.onclick=()=>pfSelectTipo('imagem');tipoOptions.appendChild(optTexto);tipoOptions.appendChild(optImagem);if(pfState.tamanho==='A2'||pfState.tamanho==='A1'){const optChapado=document.createElement('div');optChapado.className='pf-card';optChapado.innerHTML='<div class="pf-icon">\u{1F7EB}</div><h4>'+labelCor+' \u2014 Fundo chapado</h4><p>Arte pesada, muita tinta</p>';optChapado.onclick=()=>pfSelectTipo('chapado');tipoOptions.appendChild(optChapado);}$('pfConfigArea').style.display='none';pfGoTo(3);}
-function pfSelectTipo(tipo){pfState.tipo=tipo;$('pfConfigArea').style.display='block';const faixaInfo=$('pfFaixaInfo');if(pfState.tamanho==='A4'){const tabela=pfState.cor==='pb'?TABELA_PB_TEXTO:TABELA_COR_TEXTO;const mult={texto:1,imagem:1.30,chapado:1.60}[pfState.tipo];let teto,piso;if(pfState.tipo==='chapado'){teto=pfState.cor==='pb'?2.00:2.50;piso=pfState.cor==='pb'?0.96:1.20;}faixaInfo.style.display='block';faixaInfo.textContent=faixaTabela(tabela,mult,teto,piso);}else{faixaInfo.style.display='none';}const ladoField=$('pfLadoField');if(pfState.tamanho==='A2'||pfState.tamanho==='A1'){ladoField.style.display='none';}else{ladoField.style.display='block';}pfCalc();}
+function pfGoTo(n){}
+function pfReset(){pfState={tamanho:null,cor:null,tipo:null};document.querySelectorAll('#pfTamGrid .pf-card').forEach(c=>c.classList.remove('selected'));$('pfInlineConfig').style.display='none';}
+function pfSelectTamanho(tam){pfState.tamanho=tam;document.querySelectorAll('#pfTamGrid .pf-card').forEach(c=>c.classList.remove('selected'));$('pfCard'+tam).classList.add('selected');$('pfInlineConfig').style.display='block';if(!pfState.cor)pfSetCor('pb');else{pfBuildTipo();pfCalc();}}
+function pfSetCor(cor){pfState.cor=cor;$('pfBtnPB').classList.toggle('active',cor==='pb');$('pfBtnCor').classList.toggle('active',cor==='cor');pfBuildTipo();pfCalc();}
+function pfBuildTipo(){const tam=pfState.tamanho,cor=pfState.cor;if(!tam||!cor)return;const tipos=PF_PRECOS[tam][cor];const keys=Object.keys(tipos);const tipoField=$('pfTipoField'),group=$('pfTipoGroup');group.innerHTML='';if(keys.length<=1){tipoField.style.display='none';pfState.tipo=keys[0];}else{tipoField.style.display='';if(!pfState.tipo||!tipos[pfState.tipo])pfState.tipo=keys[0];const labels={texto:'Texto/Documento',imagem:'Com imagem',chapado:'Fundo chapado'};keys.forEach(k=>{const btn=document.createElement('button');btn.className='btn-opt'+(pfState.tipo===k?' active':'');btn.textContent=labels[k]||k;btn.onclick=()=>{pfState.tipo=k;group.querySelectorAll('.btn-opt').forEach(b=>b.classList.remove('active'));btn.classList.add('active');pfCalc();};group.appendChild(btn);});}const isGrande=(tam==='A2'||tam==='A1');$('pfLadoField').style.display=isGrande?'none':'';const faixaInfo=$('pfFaixaInfo');if(tam==='A4'){const tabela=cor==='pb'?TABELA_PB_TEXTO:TABELA_COR_TEXTO;const mult={texto:1,imagem:1.30,chapado:1.60}[pfState.tipo||'texto'];faixaInfo.style.display='block';faixaInfo.textContent=faixaTabela(tabela,mult);}else{faixaInfo.style.display='none';}}
 function pfCalc(){if(!pfState.tipo)return;const qty=+$('pfQtyInput').value||1;const lado=$('pfLadoSelect').value;const unit=PF_PRECOS[pfState.tamanho][pfState.cor][pfState.tipo].fn(qty);let subtotal=qty*unit;let desconto=0;const isGrande=(pfState.tamanho==='A2'||pfState.tamanho==='A1');if(lado==='fv'&&!isGrande){desconto=subtotal*0.20;}const total=subtotal-desconto;$('pfUnit').textContent=fmt(unit);const descRow=$('pfDescRow');if(desconto>0){descRow.style.display='flex';$('pfDesc').textContent='- '+fmt(desconto);}else{descRow.style.display='none';}$('pfTotal').textContent=fmt(total);const corLabel=pfState.cor==='pb'?'Preto e Branco':'Colorido';const tipoLabel=pfState.tipo==='texto'?'Texto':'Com imagem';const ladoLabel=(lado==='fv'&&!isGrande)?'Frente e verso':'Frente apenas';const linhas=['Ol\u00e1! Quero fazer um or\u00e7amento:','','*Produto:* Impress\u00e3o Papel Comum '+pfState.tamanho,'*Tipo:* '+corLabel+' \u2014 '+tipoLabel,'*Quantidade:* '+qty+' folha(s)','*Impress\u00e3o:* '+ladoLabel];if(desconto>0)linhas.push('*Desconto frente/verso:* -'+fmt(desconto));linhas.push('*Total estimado:* '+fmt(total));linhas.push('');linhas.push('Poderia confirmar e indicar o prazo de entrega?');const msg=encodeURIComponent(linhas.join('\n'));$('pfWppBtn').href='https://wa.me/'+PHONE+'?text='+msg;}
 let epState={papel:null,tamanho:null,lado:'frente'};
 function epGoTo(n){document.querySelectorAll('#especiaisFlow .pf-screen').forEach(s=>s.classList.remove('active'));$('ep'+n).classList.add('active');}
