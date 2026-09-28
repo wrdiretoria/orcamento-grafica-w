@@ -117,28 +117,18 @@ footer{text-align:center;padding:1.5rem;font-size:12px;color:#bbb;border-top:1px
 <div class="pf-card" id="pfCardA1" onclick="pfSelectTamanho('A1')"><div class="pf-icon">📋</div><h4>A1</h4><p>59,4 x 84,1 cm</p></div>
 </div>
 <div id="pfInlineConfig" style="display:none;margin-top:1.5rem">
-<div class="field"><label>Cor</label>
-<div class="btn-group">
-<button class="btn-opt" id="pfBtnPB" onclick="pfSetCor('pb')">Preto e Branco</button>
-<button class="btn-opt" id="pfBtnCor" onclick="pfSetCor('cor')">Colorido</button>
+<div class="field"><label>Impressão</label>
+<div class="pf-grid">
+<div class="pf-card" id="pfBtnPB" onclick="pfSetCor('pb')"><h4>Preto e Branco</h4></div>
+<div class="pf-card" id="pfBtnCor" onclick="pfSetCor('cor')"><h4>Colorido</h4></div>
 </div></div>
-<div class="field" id="pfTipoField"><label>Tipo de conteúdo</label>
-<div class="btn-group" id="pfTipoGroup"></div></div>
-<div class="field">
-<label>Quantidade de folhas</label>
-<input type="number" id="pfQtyInput" min="1" value="10" oninput="pfCalc()">
-<div class="faixa-info" id="pfFaixaInfo" style="display:none"></div>
-</div>
-<div class="field" id="pfLadoField"><label>Impressão</label>
-<select id="pfLadoSelect" onchange="pfCalc()">
-<option value="frente">Frente apenas</option>
-<option value="fv">Frente e verso (20% desconto)</option>
-</select></div>
+<div class="field" id="pfQtdSection" style="display:none"><label>Quantidade</label>
+<div class="pf-grid" id="pfQtdGrid"></div></div>
+<div id="pfResultSection" style="display:none;margin-top:1rem">
 <div class="result-card">
-<div class="result-row"><span class="label">Preço unitário</span><span class="value" id="pfUnit">—</span></div>
-<div class="result-row desconto" id="pfDescRow" style="display:none"><span class="label">Desconto frente/verso</span><span class="value" id="pfDesc">—</span></div>
 <div class="result-row total"><span class="label">Total estimado</span><span class="value" id="pfTotal">R$ 0,00</span></div>
 <a class="whatsapp-btn" id="pfWppBtn" href="#" target="_blank"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Pedir via WhatsApp</a>
+</div>
 </div>
 </div>
 </div>
@@ -516,10 +506,12 @@ let pfState={tamanho:null,cor:null,tipo:null};
 const fmt=v=>"R$ "+v.toFixed(2).replace(".",",");
 const $=id=>document.getElementById(id);
 function pfGoTo(n){}
-function pfReset(){pfState={tamanho:null,cor:null,tipo:null};document.querySelectorAll('#pfTamGrid .pf-card').forEach(c=>c.classList.remove('selected'));$('pfInlineConfig').style.display='none';}
-function pfSelectTamanho(tam){pfState.tamanho=tam;document.querySelectorAll('#pfTamGrid .pf-card').forEach(c=>c.classList.remove('selected'));$('pfCard'+tam).classList.add('selected');$('pfInlineConfig').style.display='block';if(!pfState.cor)pfSetCor('pb');else{pfBuildTipo();pfCalc();}}
-function pfSetCor(cor){pfState.cor=cor;$('pfBtnPB').classList.toggle('active',cor==='pb');$('pfBtnCor').classList.toggle('active',cor==='cor');pfBuildTipo();pfCalc();}
-function pfBuildTipo(){const tam=pfState.tamanho,cor=pfState.cor;if(!tam||!cor)return;const tipos=PF_PRECOS[tam][cor];const keys=Object.keys(tipos);const tipoField=$('pfTipoField'),group=$('pfTipoGroup');group.innerHTML='';if(keys.length<=1){tipoField.style.display='none';pfState.tipo=keys[0];}else{tipoField.style.display='';if(!pfState.tipo||!tipos[pfState.tipo])pfState.tipo=keys[0];const labels={texto:'Texto/Documento',imagem:'Com imagem',chapado:'Fundo chapado'};keys.forEach(k=>{const btn=document.createElement('button');btn.className='btn-opt'+(pfState.tipo===k?' active':'');btn.textContent=labels[k]||k;btn.onclick=()=>{pfState.tipo=k;group.querySelectorAll('.btn-opt').forEach(b=>b.classList.remove('active'));btn.classList.add('active');pfCalc();};group.appendChild(btn);});}const isGrande=(tam==='A2'||tam==='A1');$('pfLadoField').style.display=isGrande?'none':'';const faixaInfo=$('pfFaixaInfo');if(tam==='A4'){const tabela=cor==='pb'?TABELA_PB_TEXTO:TABELA_COR_TEXTO;const mult={texto:1,imagem:1.30,chapado:1.60}[pfState.tipo||'texto'];faixaInfo.style.display='block';faixaInfo.textContent=faixaTabela(tabela,mult);}else{faixaInfo.style.display='none';}}
+function pfReset(){pfState={tamanho:null,cor:null,tipo:null};document.querySelectorAll('#pfTamGrid .pf-card').forEach(c=>c.classList.remove('selected'));$('pfInlineConfig').style.display='none';$('pfQtdSection').style.display='none';$('pfResultSection').style.display='none';}
+function pfSelectTamanho(tam){pfState.tamanho=tam;pfState.cor=null;document.querySelectorAll('#pfTamGrid .pf-card').forEach(c=>c.classList.remove('selected'));$('pfCard'+tam).classList.add('selected');document.querySelectorAll('#pfBtnPB,#pfBtnCor').forEach(c=>c.classList.remove('selected'));$('pfInlineConfig').style.display='block';$('pfQtdSection').style.display='none';$('pfResultSection').style.display='none';}
+function pfSetCor(cor){pfState.cor=cor;document.querySelectorAll('#pfBtnPB,#pfBtnCor').forEach(c=>c.classList.remove('selected'));$(cor==='pb'?'pfBtnPB':'pfBtnCor').classList.add('selected');pfBuildQtd();}
+function pfBuildQtd(){const tam=pfState.tamanho,cor=pfState.cor;if(!tam||!cor)return;const qtds={A4:[10,25,50,100,200,500,1000],A3:[1,5,10,25,50],A2:[1,5,10],A1:[1,5,10]}[tam]||[1,5,10];const grid=$('pfQtdGrid');grid.innerHTML='';qtds.forEach(q=>{const unit=PF_PRECOS[tam][cor]['texto'].fn(q);const total=Math.round(q*unit*100)/100;const card=document.createElement('div');card.className='pf-card';card.innerHTML='<h4>'+q+' un</h4><p style="font-weight:600;color:#1a73e8">'+fmt(total)+'</p>';card.onclick=(()=>{const _q=q,_total=total;return()=>pfSelectQtd(_q,_total,card);})();grid.appendChild(card);});$('pfQtdSection').style.display='';$('pfResultSection').style.display='none';}
+function pfSelectQtd(q,total,cardEl){document.querySelectorAll('#pfQtdGrid .pf-card').forEach(c=>c.classList.remove('selected'));cardEl.classList.add('selected');$('pfTotal').textContent=fmt(total);$('pfResultSection').style.display='';const corLabel=pfState.cor==='pb'?'Preto e Branco':'Colorido';const msg='Olá! Quero orçamento:\n*Impressão Papel Comum '+pfState.tamanho+'* — '+corLabel+'\n*Quantidade:* '+q+' folha(s)\n*Total estimado:* '+fmt(total)+'\n\nPoderia confirmar disponibilidade e prazo?';$('pfWppBtn').href='https://wa.me/'+PHONE+'?text='+encodeURIComponent(msg);}
+function pfCalc(){}
 function pfCalc(){if(!pfState.tipo)return;const qty=+$('pfQtyInput').value||1;const lado=$('pfLadoSelect').value;const unit=PF_PRECOS[pfState.tamanho][pfState.cor][pfState.tipo].fn(qty);let subtotal=qty*unit;let desconto=0;const isGrande=(pfState.tamanho==='A2'||pfState.tamanho==='A1');if(lado==='fv'&&!isGrande){desconto=subtotal*0.20;}const total=subtotal-desconto;$('pfUnit').textContent=fmt(unit);const descRow=$('pfDescRow');if(desconto>0){descRow.style.display='flex';$('pfDesc').textContent='- '+fmt(desconto);}else{descRow.style.display='none';}$('pfTotal').textContent=fmt(total);const corLabel=pfState.cor==='pb'?'Preto e Branco':'Colorido';const tipoLabel=pfState.tipo==='texto'?'Texto':'Com imagem';const ladoLabel=(lado==='fv'&&!isGrande)?'Frente e verso':'Frente apenas';const linhas=['Ol\u00e1! Quero fazer um or\u00e7amento:','','*Produto:* Impress\u00e3o Papel Comum '+pfState.tamanho,'*Tipo:* '+corLabel+' \u2014 '+tipoLabel,'*Quantidade:* '+qty+' folha(s)','*Impress\u00e3o:* '+ladoLabel];if(desconto>0)linhas.push('*Desconto frente/verso:* -'+fmt(desconto));linhas.push('*Total estimado:* '+fmt(total));linhas.push('');linhas.push('Poderia confirmar e indicar o prazo de entrega?');const msg=encodeURIComponent(linhas.join('\n'));$('pfWppBtn').href='https://wa.me/'+PHONE+'?text='+msg;}
 let epState={papel:null,tamanho:null,lado:'frente'};
 function epGoTo(n){document.querySelectorAll('#especiaisFlow .pf-screen').forEach(s=>s.classList.remove('active'));$('ep'+n).classList.add('active');}
